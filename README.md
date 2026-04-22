@@ -28,10 +28,11 @@ Before you begin, ensure you have:
 bun install
 ```
 
-### 3. Environment Variables
+### 3. **Environment Variables**
 Create a `.env` file in the root directory and add the following:
 ```env
 LINE_ACCESS_TOKEN=your_line_access_token
+LINE_CHANNEL_SECRET=your_line_channel_secret
 GEMINI_API_KEY=your_gemini_api_key
 PORT=3000
 ```
@@ -54,18 +55,33 @@ This project is ready to be deployed on [Railway](https://railway.app/).
 ### Option 1: Deploy via GitHub (CI/CD)
 1. **Push to GitHub:** Ensure your code is pushed to a GitHub repository.
 2. **Connect to Railway:**
-   - Log in to Railway and click **"New Project"**.
-   - Select **"Deploy from GitHub repo"** and choose this repository.
-3. **Configure Variables:** Add `LINE_ACCESS_TOKEN` and `GEMINI_API_KEY` in the **Variables** tab.
+   - **New Project:** Click **"New Project"** > **"Deploy from GitHub repo"**.
+   - **Existing Project:** Inside your project dashboard, click **"New"** > **"GitHub Repo"**.
+   - Select this repository to create a new service.
+3. **Configure Variables:** Add the following variables in the **Variables** tab:
+   - `LINE_ACCESS_TOKEN`
+   - `LINE_CHANNEL_SECRET`
+   - `GEMINI_API_KEY`
+4. **Settings (Railway UI):** In the **Settings** tab, configure the following:
+   - **Builder:** Select `Railpack`
+   - **Custom Build Command:** `bun install`
+   - **Custom Start Command:** `bun run index.ts`
 
 ### Option 2: Deploy via Railway CLI
 If you prefer deploying directly from your terminal:
 
 1. **Install CLI:** `npm i -g @railway/cli`
 2. **Login:** `railway login`
-3. **Deploy:** `railway up`
-   - *Tip: Use `railway up -d` for detached mode.*
-4. **Set Variables:** `railway variables set $(cat .env | xargs)`
+3. **Link Project:** `railway link` (if not already linked)
+4. **Set Variables:** 
+   ```bash
+   railway variables set LINE_ACCESS_TOKEN=xxx LINE_CHANNEL_SECRET=xxx GEMINI_API_KEY=xxx
+   ```
+   *Or bulk upload from .env:*
+   ```bash
+   railway variables set $(cat .env | xargs)
+   ```
+5. **Deploy:** `railway up`
 
 ### 🔗 Webhook Setup
 - Once deployed, get your public URL from Railway.
