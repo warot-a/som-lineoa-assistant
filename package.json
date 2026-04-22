@@ -19,6 +19,7 @@
     "start": "bun run index.ts",
     "dev": "bun run --hot index.ts",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },
   "type": "module",
