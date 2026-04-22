@@ -14,8 +14,9 @@ const app = new Elysia()
 		}
 	})
 	.onError(({ code }) => {
-		if (code === 'NOT_FOUND')
+		if (code === 'NOT_FOUND') {
 			return 'Not Found :('
+		}
 	})
 	.use(loggerPlugin)
 	.state('build', Date.now())
@@ -34,7 +35,7 @@ const app = new Elysia()
 		beforeHandle: ({ query }) => {
 			console.log('Name:', query?.name)
 
-			if (query?.name === 'aom') return 'Hi saltyaom'
+			if (query?.name === 'aom') { return 'Hi saltyaom' }
 		},
 		query: t.Object({
 			name: t.String()
@@ -78,7 +79,7 @@ const app = new Elysia()
 	.group('/group', (app) =>
 		app
 			.onBeforeHandle(({ query }) => {
-				if (query?.name === 'aom') return 'Hi saltyaom'
+				if (query?.name === 'aom') { return 'Hi saltyaom' }
 			})
 			.get('/', () => 'From Group')
 			.get('/hi', () => 'HI GROUP')
