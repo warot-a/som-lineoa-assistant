@@ -49,22 +49,26 @@ bun run start
 
 This project is ready to be deployed on [Railway](https://railway.app/).
 
-### Steps to Deploy:
+### Option 1: Deploy via GitHub (CI/CD)
 1. **Push to GitHub:** Ensure your code is pushed to a GitHub repository.
 2. **Connect to Railway:**
    - Log in to Railway and click **"New Project"**.
    - Select **"Deploy from GitHub repo"** and choose this repository.
-3. **Configure Variables:**
-   - In your Railway project, go to the **"Variables"** tab.
-   - Add the following variables:
-     - `LINE_ACCESS_TOKEN`
-     - `GEMINI_API_KEY`
-   - *Note: Railway automatically provides a `PORT` variable, which the application will use.*
-4. **Set Up Webhook:**
-   - Once deployed, Railway will provide a public URL (e.g., `https://som-assistant-production.up.railway.app`).
-   - Go to your **LINE Developers Console** -> **Messaging API** tab.
-   - Set the **Webhook URL** to your Railway URL and ensure it ends with the correct path (if any). In this project, the root `/` handles POST requests.
-   - Enable **"Use webhook"**.
+3. **Configure Variables:** Add `LINE_ACCESS_TOKEN` and `GEMINI_API_KEY` in the **Variables** tab.
+
+### Option 2: Deploy via Railway CLI
+If you prefer deploying directly from your terminal:
+
+1. **Install CLI:** `npm i -g @railway/cli`
+2. **Login:** `railway login`
+3. **Deploy:** `railway up`
+   - *Tip: Use `railway up -d` for detached mode.*
+4. **Set Variables:** `railway variables set $(cat .env | xargs)`
+
+### 🔗 Webhook Setup
+- Once deployed, get your public URL from Railway.
+- In **LINE Developers Console**, set the **Webhook URL** to your Railway URL.
+- Enable **"Use webhook"**.
 
 ## 📝 How it Works
 1. The server listens for incoming Webhooks from LINE on the specified port.
