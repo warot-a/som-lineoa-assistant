@@ -1,0 +1,19 @@
+{
+  "name": "som-assistant",
+  "module": "index.ts",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": true,
+  "scripts": {
+    "start": "bun run index.ts",
+    "dev": "bun run --hot index.ts"
+  },
+  "type": "module",
+  "dependencies": {
+    "@google/genai": "^1.50.1"
+  }
+}
