@@ -8,6 +8,7 @@ Som Assistant is an intelligent LINE Bot powered by Google Gemini AI, designed t
 - **AI Powered:** Utilizes the latest Gemini models for natural language processing and intelligent responses.
 - **Fast & Lightweight:** Built with [Bun](https://bun.sh/) for high performance and low resource consumption.
 - **Seamless Integration:** Direct connection with the LINE Messaging API.
+- **Built-in Commands:** Easily check deployment version with `/version`.
 
 ## 🛠 Tech Stack
 - **Runtime:** Bun
@@ -47,6 +48,23 @@ bun run dev
 ```bash
 bun run start
 ```
+
+### 🐞 Local Debugging (VS Code)
+This project includes a VS Code launch configuration for easy debugging:
+1. Install the **Bun** extension for VS Code.
+2. Set breakpoints in your code.
+3. Press `F5` or go to **Run and Debug** > **Debug Bun App**.
+4. Use `curl` to trigger the webhook locally. 
+   > [!IMPORTANT]
+   > For local testing without valid LINE signatures, you may need to **temporarily comment out** the signature verification logic in `src/controllers/webhook.controller.ts` (lines 20-24).
+
+   **Example Test Command:**
+   ```bash
+   curl -X POST http://localhost:3000/ \
+     -H "Content-Type: application/json" \
+     -H "x-line-signature: test" \
+     -d '{"events": [{"type": "message", "message": {"type": "text", "text": "version"}, "replyToken": "test"}]}'
+   ```
 
 ## ☁️ Deployment to Railway
 
@@ -90,6 +108,7 @@ If you prefer deploying directly from your terminal:
 
 ## 📝 How it Works
 1. The server listens for incoming Webhooks from LINE on the specified port.
-2. When a user sends a message, the system forwards the text to Gemini AI.
-3. The AI's response is then sent back to the user via the LINE Reply API.
+2. When a user sends a message, the system checks for special commands (like `version`).
+3. If no command is matched, it forwards the text to Gemini AI for an intelligent response.
+4. The response is then sent back to the user via the LINE Reply API.
 

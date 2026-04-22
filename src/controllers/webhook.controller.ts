@@ -32,8 +32,15 @@ export const webhookController = (lineService: LineService, geminiService: Gemin
                         return;
                     }
 
-                    const userText = event.message.text;
+                    const userText = event.message.text.trim().toLowerCase();
                     const replyToken = event.replyToken;
+
+                    // เพิ่มเงื่อนไขเช็คเวอร์ชัน (ใช้ Commit SHA 7 หลักแรก)
+                    if (userText === "version" || userText === "/version") {
+                        const sha = process.env.RAILWAY_GIT_COMMIT_SHA?.substring(0, 7) || "development";
+                        await lineService.replyMessage(replyToken, `Som Assistant Version: ${sha}`);
+                        return;
+                    }
 
                     try {
                         const aiResponse = await geminiService.generateReply(userText);
