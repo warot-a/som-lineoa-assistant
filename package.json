@@ -2,18 +2,32 @@
   "name": "som-assistant",
   "module": "index.ts",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@eslint/js": "^10.0.1",
+    "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "^8.59.0",
+    "@typescript-eslint/parser": "^8.59.0",
+    "eslint": "^10.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "typescript-eslint": "^8.59.0"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   },
   "private": true,
   "scripts": {
     "start": "bun run index.ts",
-    "dev": "bun run --hot index.ts"
+    "dev": "bun run --hot index.ts",
+    "lint": "eslint .",
+    "prepare": "husky"
   },
   "type": "module",
   "dependencies": {
     "@google/genai": "^1.50.1"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix"
+    ]
   }
 }
