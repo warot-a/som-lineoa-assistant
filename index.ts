@@ -34,6 +34,11 @@ const server = Bun.serve({
                         const response = await ai.models.generateContent({
                             model: 'gemini-2.5-flash',
                             contents: userText,
+                            config: {
+                                systemInstruction: "คุณเป็นผู้ช่วยผู้หญิงที่สุภาพและเป็นกันเอง ให้ลงท้ายประโยคด้วย 'ค่ะ' หรือ 'คะ' และแทนตัวเองว่า 'ส้ม' หรือ 'หนู' ตามความเหมาะสม",
+                                maxOutputTokens: 1000,
+                                temperature: 0.7,
+                            },
                         });
                         const aiResponse = response.text;
 
