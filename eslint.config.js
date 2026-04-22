@@ -5,9 +5,12 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    ignores: ["node_modules/", "dist/", "bun.lock"],
+    ignores: ["node_modules/", "dist/", "bun.lock", ".agents/"],
+  },
+  {
     rules: {
       "curly": ["error", "all"],
+      "@typescript-eslint/no-unused-vars": "error"
     }
   }
 );

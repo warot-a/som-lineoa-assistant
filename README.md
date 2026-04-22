@@ -13,7 +13,7 @@ Som Assistant is an intelligent LINE Bot powered by Google Gemini AI, designed t
 - **Runtime:** Bun
 - **Language:** TypeScript
 - **AI Model:** Google Generative AI (Gemini)
-- **Framework:** Bun.serve (Built-in HTTP Server)
+- **Framework:** [ElysiaJS](https://elysiajs.com/) (High-performance web framework for Bun)
 
 ## 🚀 Installation & Setup
 
