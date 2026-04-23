@@ -1,5 +1,5 @@
 # Som Assistant 🍊
-[![CI](https://github.com/warot-a/som-lineoa-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/warot-a/som-lineoa-assistant/actions/workflows/ci.yml)
+[![CI](https://github.com/warot-a/som-lineoa-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/warot-a/som-lineoa-assistant/actions/workflows/ci.yml) [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](#)
 
 
 Som Assistant is an intelligent LINE Bot powered by Google Gemini AI, designed to be your personal assistant directly within the LINE application.

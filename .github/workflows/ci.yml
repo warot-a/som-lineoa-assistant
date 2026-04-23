@@ -19,7 +19,7 @@ jobs:
         run: bun run lint
 
   typecheck:
-    name: Type Check (Build Validation)
+    name: Type Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -30,3 +30,26 @@ jobs:
         run: bun install
       - name: Check types
         run: bunx tsc
+
+  test:
+    name: Run Unit Tests & Coverage
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install
+      - name: Run tests with coverage
+        run: bun test --coverage --coverage-reporter=lcov
+      - name: Jest Coverage Comment
+        uses: MishaKav/jest-coverage-comment@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          coverage-summary-path: ./coverage/lcov.info
+          badge-actions-enabled: true
+          title: "Coverage Report"
