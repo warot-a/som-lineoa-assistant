@@ -49,7 +49,33 @@ bun run dev
 bun run start
 ```
 
-### 🐞 Local Debugging (VS Code)
+## 🐳 Docker
+
+This project includes a multi-stage `Dockerfile` optimized for Bun to keep the production image small and secure.
+
+### 1. Build the Image
+```bash
+docker build --pull --no-cache -t som-assistant .
+```
+
+### 2. Run the Container
+You can run the container by passing environment variables directly or using an `.env` file:
+
+**Using environment variables:**
+```bash
+docker run -p 3000:3000 \
+  -e LINE_ACCESS_TOKEN=your_token \
+  -e LINE_CHANNEL_SECRET=your_secret \
+  -e GEMINI_API_KEY=your_key \
+  som-assistant
+```
+
+**Using an `.env` file:**
+```bash
+docker run -p 3000:3000 --env-file .env som-assistant
+```
+
+## 🐞 Local Debugging (VS Code)
 This project includes a VS Code launch configuration for easy debugging:
 1. Install the **Bun** extension for VS Code.
 2. Set breakpoints in your code.
@@ -111,4 +137,3 @@ If you prefer deploying directly from your terminal:
 2. When a user sends a message, the system checks for special commands (like `version`).
 3. If no command is matched, it forwards the text to Gemini AI for an intelligent response.
 4. The response is then sent back to the user via the LINE Reply API.
-
