@@ -32,9 +32,17 @@ describe("GeminiService", () => {
         expect(mockGenerateContent).toHaveBeenCalledTimes(1);
 
         expect(mockGenerateContent).toHaveBeenCalledWith({
-            model: 'gemini-2.5-flash',
-            contents: "สวัสดี",
-            config: expect.any(Object),
+            model: "gemini-2.5-flash",
+            contents: [
+                {
+                    role: "user",
+                    parts: [{ text: "สวัสดี" }],
+                },
+            ],
+            config: {
+                systemInstruction: expect.any(String),
+                temperature: 0.7,
+            },
         });
     });
 
