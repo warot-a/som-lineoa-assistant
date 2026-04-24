@@ -1,5 +1,5 @@
 import { expect, test, describe, mock, beforeEach } from "bun:test";
-import { GeminiService } from "./gemini.service";
+import { GeminiService } from "@/services/gemini.service";
 
 const mockGenerateContent = mock();
 

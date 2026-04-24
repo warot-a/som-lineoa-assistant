@@ -1,5 +1,5 @@
 import { expect, test, describe, beforeEach, afterEach, mock, spyOn } from "bun:test";
-import { LineService } from "./line.service";
+import { LineService } from "@/services/line.service";
 import { createHmac } from "node:crypto";
 
 describe("LineService", () => {
@@ -14,7 +14,7 @@ describe("LineService", () => {
     describe("verifySignature", () => {
         test("should return true for valid signature", () => {
             const body = JSON.stringify({ events: [] });
-            
+
             // Create a valid mock signature
             const expectedSignature = createHmac("sha256", mockChannelSecret)
                 .update(body)
@@ -86,9 +86,9 @@ describe("LineService", () => {
         test("should catch error and log to console if replyMessage fails", async () => {
             // Mock replyMessage failure
             const replySpy = spyOn(service, "replyMessage").mockRejectedValue(new Error("Network Timeout"));
-            
+
             // Catch console.error to prevent it from logging to the terminal during tests
-            const consoleSpy = spyOn(console, "error").mockImplementation(() => {});
+            const consoleSpy = spyOn(console, "error").mockImplementation(() => { });
 
             // This function should not throw (it has an internal try-catch)
             await service.sendErrorFallback("token-456");
