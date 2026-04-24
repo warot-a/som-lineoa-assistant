@@ -25,7 +25,8 @@
   "type": "module",
   "dependencies": {
     "@google/genai": "^1.50.1",
-    "elysia": "^1.4.28"
+    "elysia": "^1.4.28",
+    "mongoose": "^9.5.0"
   },
   "lint-staged": {
     "*.ts": [
