@@ -1,139 +1,159 @@
-# Som Assistant 🍊
-[![CI](https://github.com/warot-a/som-lineoa-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/warot-a/som-lineoa-assistant/actions/workflows/ci.yml) [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](#)
+# Som Assistant (น้องส้ม) 🍊
 
+**Som Assistant** (Nong Som) is a smart, context-aware personal assistant integrated directly into the LINE Messaging app. Powered by Google's state-of-the-art **Gemini AI (`gemini-2.5-flash`)** model, it maintains multi-turn conversation context and manages user sessions gracefully.
 
-Som Assistant is an intelligent LINE Bot powered by Google Gemini AI, designed to be your personal assistant directly within the LINE application.
+It is built with **Node.js** using the **NestJS** framework, utilizing **MongoDB** to persist conversational history and structured session summaries.
 
-## ✨ Features
-- **AI Powered:** Utilizes the latest Gemini models for natural language processing and intelligent responses.
-- **Fast & Lightweight:** Built with [Bun](https://bun.sh/) for high performance and low resource consumption.
-- **Seamless Integration:** Direct connection with the LINE Messaging API.
-- **Built-in Commands:** Easily check deployment version with `/version`.
+---
+
+## 🚀 Key Features
+
+*   **Context-Aware Conversational AI**: Nong Som maintains full conversation history rather than treating messages as one-off interactions. She automatically retrieves preceding messages for rich, highly relevant AI-driven conversational responses.
+*   **Time-Based Session Lifecycle (1-Hour TTL)**: 
+    *   Sessions automatically close after **1 hour of inactivity**.
+    *   If a user sends a message after 1 hour, the active session is automatically finalized, archived with a summary, and a clean new session starts immediately.
+*   **Manual Session Reset & Summarization ("เริ่มเรื่องใหม่")**:
+    *   Triggered via a LINE postback (e.g. `action=reset` from a Rich Menu or button).
+    *   Nong Som will automatically digest the current active conversation, compile a concise Thai bullet-point summary (up to 5 key points), and archive the session.
+    *   A premium-looking **LINE Flex Message** is returned to the user with the summary, leaving the conversation state fresh and ready.
+*   **Built-in `/version` Command**:
+    *   Send `version` or `/version` to instantly view the current Git commit SHA (or `development` locally) for transparent build tracking.
+*   **Robust Signature Verification**:
+    *   A custom NestJS Guard strictly validates incoming `x-line-signature` headers using HMAC-SHA256 and your `LINE_CHANNEL_SECRET` to ensure all traffic originates from LINE's servers.
+
+---
 
 ## 🛠 Tech Stack
-- **Runtime:** Bun
-- **Language:** TypeScript
-- **AI Model:** Google Generative AI (Gemini)
-- **Framework:** [ElysiaJS](https://elysiajs.com/) (High-performance web framework for Bun)
 
-## 🚀 Installation & Setup
+*   **Framework**: [NestJS](https://nestjs.com/) (v11+)
+*   **Runtime**: [Node.js](https://nodejs.org/) (v18+)
+*   **Package Manager**: `pnpm`
+*   **Database**: [MongoDB](https://www.mongodb.com/) via [Mongoose](https://mongoosejs.com/) (`@nestjs/mongoose`)
+*   **AI Engine**: [Google Generative AI SDK](https://github.com/google-gemini/generative-ai-js) (`@google/genai`) using `gemini-2.5-flash`
+*   **HTTP Client**: [Axios](https://github.com/axios/axios) for LINE Messaging API communication
 
-### 1. Prerequisites
-Before you begin, ensure you have:
-- [Bun](https://bun.sh/) installed on your machine.
-- **LINE Channel Access Token:** Obtain this from the [LINE Developers Console](https://developers.line.biz/).
-- **Gemini API Key:** Obtain this from [Google AI Studio](https://aistudio.google.com/).
+---
 
-### 2. Install Dependencies
-```bash
-bun install
+## 📁 Project Structure
+
+Following NestJS modular design best practices, the application code is structured by domain feature modules:
+
+```text
+src/
+├── app.module.ts               # Root module orchestrating all feature modules
+├── main.ts                     # Application entry point with raw body parsing enabled
+├── types.ts                    # Shared TypeScript interfaces & types
+├── config/                     # Configuration module validating environment variables
+│   ├── config.module.ts
+│   └── config.service.ts
+├── database/                   # Database module establishing Mongoose connection
+│   └── database.module.ts
+├── gemini/                     # Gemini AI module for chat replies and summaries
+│   ├── gemini.module.ts
+│   └── gemini.service.ts
+├── line/                       # LINE Messaging API module
+│   ├── line.module.ts
+│   ├── line.service.ts
+│   └── guards/
+│       └── line-signature.guard.ts  # Guard to verify x-line-signature
+├── session/                    # Session lifecycle and database models
+│   ├── session.module.ts
+│   ├── session.service.ts
+│   └── schemas/
+│       └── session.schema.ts   # Mongoose schemas for Session and Message
+└── webhook/                    # Webhook endpoint and webhook event routing
+    ├── webhook.module.ts
+    └── webhook.controller.ts   # Webhook controller handling messages & postbacks
 ```
 
-### 3. **Environment Variables**
-Create a `.env` file in the root directory and add the following:
+---
+
+## 💻 Local Development
+
+### 1. Prerequisites
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- A running [MongoDB](https://www.mongodb.com/) instance (local or Atlas)
+- A [Gemini API Key](https://aistudio.google.com/)
+- A [LINE Developers Account](https://developers.line.biz/) with a Messaging API Channel
+
+### 2. Installation
+Clone the repository and install dependencies:
+```bash
+pnpm install
+```
+
+### 3. Environment Configuration
+Create a `.env` file in the root directory (use `.env.example` as a template):
 ```env
-LINE_ACCESS_TOKEN=your_line_access_token
+LINE_ACCESS_TOKEN=your_line_channel_access_token
 LINE_CHANNEL_SECRET=your_line_channel_secret
-GEMINI_API_KEY=your_gemini_api_key
+GEMINI_API_KEY=your_google_gemini_api_key
+MONGODB_URI=mongodb://localhost:27017/som-assistant
 PORT=3000
 ```
 
-### 4. Run the Project
-**For Development (with Hot Reload):**
+### 4. Running the App
 ```bash
-bun run dev
+# Development (watch mode)
+pnpm run start:dev
+
+# Production build and run
+pnpm run build
+pnpm run start:prod
 ```
 
-**For Production:**
+### 5. Local Tunneling for Webhook Testing
+Since LINE Webhooks require an HTTPS URL, use a tunneling tool like `ngrok` or `localtunnel` to expose your local server:
 ```bash
-bun run start
+ngrok http 3000
+```
+Then, copy the `https://...` forwarding address, append `/webhook`, and paste it into the **Webhook URL** field in your LINE Developer Console (e.g., `https://your-tunnel.ngrok.io/webhook`). Make sure to enable **Use Webhook**!
+
+---
+
+## 🧪 Testing & Validation
+
+```bash
+# Run ESLint validation
+pnpm run lint
+
+# Format codebase using Prettier
+pnpm run format
+
+# Run all unit tests
+pnpm run test
+
+# Run e2e tests
+pnpm run test:e2e
 ```
 
-## 🐳 Docker
+---
 
-This project includes a multi-stage `Dockerfile` optimized for Bun to keep the production image small and secure.
+## 🚀 Deployment (Railway.app)
 
-### 1. Build the Image
-```bash
-docker build --pull --no-cache -t som-assistant .
-```
+This project is fully containerized and optimized for one-click deployments to **[Railway](https://railway.app)**.
 
-### 2. Run the Container
-You can run the container by passing environment variables directly or using an `.env` file:
+### Deployment Steps:
+1.  **Push to GitHub**: Push your codebase to a private/public GitHub repository.
+2.  **Create a New Project on Railway**:
+    *   Click **New Project** -> **Deploy from GitHub repo**.
+    *   Select your `som-assistant` repository.
+3.  **Add MongoDB Database**:
+    *   You can provision MongoDB directly in the same Railway project by clicking **New** -> **Database** -> **MongoDB**.
+    *   Railway will automatically provision MongoDB and provide a connection string.
+4.  **Configure Environment Variables**:
+    *   In the **Variables** tab of your service, add the following variables:
+        *   `LINE_ACCESS_TOKEN`: *Your LINE Channel Access Token*
+        *   `LINE_CHANNEL_SECRET`: *Your LINE Channel Secret*
+        *   `GEMINI_API_KEY`: *Your Google Gemini API Key*
+        *   `MONGODB_URI`: `${{MONGODB_URL}}` *(Reference the Railway-provisioned MongoDB database variables)*
+5.  **Automatic Port Binding**:
+    *   The `Dockerfile` and `src/main.ts` are pre-configured to bind to port `0.0.0.0` and read the `PORT` environment variable automatically injected by Railway.
+6.  **Verify Webhook**:
+    *   Once deployed, Railway will provide a public production URL (e.g. `https://som-assistant-production.up.railway.app`).
+    *   Update your **LINE Webhook URL** to `https://<your-railway-url>/webhook` and verify it.
 
-**Using environment variables:**
-```bash
-docker run -p 3000:3000 \
-  -e LINE_ACCESS_TOKEN=your_token \
-  -e LINE_CHANNEL_SECRET=your_secret \
-  -e GEMINI_API_KEY=your_key \
-  som-assistant
-```
+---
 
-**Using an `.env` file:**
-```bash
-docker run -p 3000:3000 --env-file .env som-assistant
-```
-
-## 🐞 Local Debugging (VS Code)
-This project includes a VS Code launch configuration for easy debugging:
-1. Install the **Bun** extension for VS Code.
-2. Set breakpoints in your code.
-3. Press `F5` or go to **Run and Debug** > **Debug Bun App**.
-4. Use `curl` to trigger the webhook locally. 
-   > [!IMPORTANT]
-   > For local testing without valid LINE signatures, you may need to **temporarily comment out** the signature verification logic in `src/controllers/webhook.controller.ts` (lines 20-24).
-
-   **Example Test Command:**
-   ```bash
-   curl -X POST http://localhost:3000/ \
-     -H "Content-Type: application/json" \
-     -H "x-line-signature: test" \
-     -d '{"events": [{"type": "message", "message": {"type": "text", "text": "version"}, "replyToken": "test"}]}'
-   ```
-
-## ☁️ Deployment to Railway
-
-This project is ready to be deployed on [Railway](https://railway.app/).
-
-### Option 1: Deploy via GitHub (CI/CD)
-1. **Push to GitHub:** Ensure your code is pushed to a GitHub repository.
-2. **Connect to Railway:**
-   - **New Project:** Click **"New Project"** > **"Deploy from GitHub repo"**.
-   - **Existing Project:** Inside your project dashboard, click **"New"** > **"GitHub Repo"**.
-   - Select this repository to create a new service.
-3. **Configure Variables:** Add the following variables in the **Variables** tab:
-   - `LINE_ACCESS_TOKEN`
-   - `LINE_CHANNEL_SECRET`
-   - `GEMINI_API_KEY`
-4. **Settings (Railway UI):** In the **Settings** tab, configure the following:
-   - **Builder:** Select `Railpack`
-   - **Custom Build Command:** `bun install`
-   - **Custom Start Command:** `bun run index.ts`
-
-### Option 2: Deploy via Railway CLI
-If you prefer deploying directly from your terminal:
-
-1. **Install CLI:** `npm i -g @railway/cli`
-2. **Login:** `railway login`
-3. **Link Project:** `railway link` (if not already linked)
-4. **Set Variables:** 
-   ```bash
-   railway variables set LINE_ACCESS_TOKEN=xxx LINE_CHANNEL_SECRET=xxx GEMINI_API_KEY=xxx
-   ```
-   *Or bulk upload from .env:*
-   ```bash
-   railway variables set $(cat .env | xargs)
-   ```
-5. **Deploy:** `railway up`
-
-### 🔗 Webhook Setup
-- Once deployed, get your public URL from Railway.
-- In **LINE Developers Console**, set the **Webhook URL** to your Railway URL.
-- Enable **"Use webhook"**.
-
-## 📝 How it Works
-1. The server listens for incoming Webhooks from LINE on the specified port.
-2. When a user sends a message, the system checks for special commands (like `version`).
-3. If no command is matched, it forwards the text to Gemini AI for an intelligent response.
-4. The response is then sent back to the user via the LINE Reply API.
+## 📄 License
+This project is [MIT licensed](LICENSE).
