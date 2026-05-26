@@ -1,159 +1,98 @@
-# Som Assistant (น้องส้ม) 🍊
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+</p>
 
-**Som Assistant** (Nong Som) is a smart, context-aware personal assistant integrated directly into the LINE Messaging app. Powered by Google's state-of-the-art **Gemini AI (`gemini-2.5-flash`)** model, it maintains multi-turn conversation context and manages user sessions gracefully.
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-It is built with **Node.js** using the **NestJS** framework, utilizing **MongoDB** to persist conversational history and structured session summaries.
+  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+    <p align="center">
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
+<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
+<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
+<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
+<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
+  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
+    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
+  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+</p>
+  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
+  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
----
+## Description
 
-## 🚀 Key Features
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-*   **Context-Aware Conversational AI**: Nong Som maintains full conversation history rather than treating messages as one-off interactions. She automatically retrieves preceding messages for rich, highly relevant AI-driven conversational responses.
-*   **Time-Based Session Lifecycle (1-Hour TTL)**: 
-    *   Sessions automatically close after **1 hour of inactivity**.
-    *   If a user sends a message after 1 hour, the active session is automatically finalized, archived with a summary, and a clean new session starts immediately.
-*   **Manual Session Reset & Summarization ("เริ่มเรื่องใหม่")**:
-    *   Triggered via a LINE postback (e.g. `action=reset` from a Rich Menu or button).
-    *   Nong Som will automatically digest the current active conversation, compile a concise Thai bullet-point summary (up to 5 key points), and archive the session.
-    *   A premium-looking **LINE Flex Message** is returned to the user with the summary, leaving the conversation state fresh and ready.
-*   **Built-in `/version` Command**:
-    *   Send `version` or `/version` to instantly view the current Git commit SHA (or `development` locally) for transparent build tracking.
-*   **Robust Signature Verification**:
-    *   A custom NestJS Guard strictly validates incoming `x-line-signature` headers using HMAC-SHA256 and your `LINE_CHANNEL_SECRET` to ensure all traffic originates from LINE's servers.
-
----
-
-## 🛠 Tech Stack
-
-*   **Framework**: [NestJS](https://nestjs.com/) (v11+)
-*   **Runtime**: [Node.js](https://nodejs.org/) (v18+)
-*   **Package Manager**: `pnpm`
-*   **Database**: [MongoDB](https://www.mongodb.com/) via [Mongoose](https://mongoosejs.com/) (`@nestjs/mongoose`)
-*   **AI Engine**: [Google Generative AI SDK](https://github.com/google-gemini/generative-ai-js) (`@google/genai`) using `gemini-2.5-flash`
-*   **HTTP Client**: [Axios](https://github.com/axios/axios) for LINE Messaging API communication
-
----
-
-## 📁 Project Structure
-
-Following NestJS modular design best practices, the application code is structured by domain feature modules:
-
-```text
-src/
-├── app.module.ts               # Root module orchestrating all feature modules
-├── main.ts                     # Application entry point with raw body parsing enabled
-├── types.ts                    # Shared TypeScript interfaces & types
-├── config/                     # Configuration module validating environment variables
-│   ├── config.module.ts
-│   └── config.service.ts
-├── database/                   # Database module establishing Mongoose connection
-│   └── database.module.ts
-├── gemini/                     # Gemini AI module for chat replies and summaries
-│   ├── gemini.module.ts
-│   └── gemini.service.ts
-├── line/                       # LINE Messaging API module
-│   ├── line.module.ts
-│   ├── line.service.ts
-│   └── guards/
-│       └── line-signature.guard.ts  # Guard to verify x-line-signature
-├── session/                    # Session lifecycle and database models
-│   ├── session.module.ts
-│   ├── session.service.ts
-│   └── schemas/
-│       └── session.schema.ts   # Mongoose schemas for Session and Message
-└── webhook/                    # Webhook endpoint and webhook event routing
-    ├── webhook.module.ts
-    └── webhook.controller.ts   # Webhook controller handling messages & postbacks
-```
-
----
-
-## 💻 Local Development
-
-### 1. Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or higher)
-- A running [MongoDB](https://www.mongodb.com/) instance (local or Atlas)
-- A [Gemini API Key](https://aistudio.google.com/)
-- A [LINE Developers Account](https://developers.line.biz/) with a Messaging API Channel
-
-### 2. Installation
-Clone the repository and install dependencies:
-```bash
-pnpm install
-```
-
-### 3. Environment Configuration
-Create a `.env` file in the root directory (use `.env.example` as a template):
-```env
-LINE_ACCESS_TOKEN=your_line_channel_access_token
-LINE_CHANNEL_SECRET=your_line_channel_secret
-GEMINI_API_KEY=your_google_gemini_api_key
-MONGODB_URI=mongodb://localhost:27017/som-assistant
-PORT=3000
-```
-
-### 4. Running the App
-```bash
-# Development (watch mode)
-pnpm run start:dev
-
-# Production build and run
-pnpm run build
-pnpm run start:prod
-```
-
-### 5. Local Tunneling for Webhook Testing
-Since LINE Webhooks require an HTTPS URL, use a tunneling tool like `ngrok` or `localtunnel` to expose your local server:
-```bash
-ngrok http 3000
-```
-Then, copy the `https://...` forwarding address, append `/webhook`, and paste it into the **Webhook URL** field in your LINE Developer Console (e.g., `https://your-tunnel.ngrok.io/webhook`). Make sure to enable **Use Webhook**!
-
----
-
-## 🧪 Testing & Validation
+## Project setup
 
 ```bash
-# Run ESLint validation
-pnpm run lint
-
-# Format codebase using Prettier
-pnpm run format
-
-# Run all unit tests
-pnpm run test
-
-# Run e2e tests
-pnpm run test:e2e
+$ pnpm install
 ```
 
----
+## Compile and run the project
 
-## 🚀 Deployment (Railway.app)
+```bash
+# development
+$ pnpm run start
 
-This project is fully containerized and optimized for one-click deployments to **[Railway](https://railway.app)**.
+# watch mode
+$ pnpm run start:dev
 
-### Deployment Steps:
-1.  **Push to GitHub**: Push your codebase to a private/public GitHub repository.
-2.  **Create a New Project on Railway**:
-    *   Click **New Project** -> **Deploy from GitHub repo**.
-    *   Select your `som-assistant` repository.
-3.  **Add MongoDB Database**:
-    *   You can provision MongoDB directly in the same Railway project by clicking **New** -> **Database** -> **MongoDB**.
-    *   Railway will automatically provision MongoDB and provide a connection string.
-4.  **Configure Environment Variables**:
-    *   In the **Variables** tab of your service, add the following variables:
-        *   `LINE_ACCESS_TOKEN`: *Your LINE Channel Access Token*
-        *   `LINE_CHANNEL_SECRET`: *Your LINE Channel Secret*
-        *   `GEMINI_API_KEY`: *Your Google Gemini API Key*
-        *   `MONGODB_URI`: `${{MONGODB_URL}}` *(Reference the Railway-provisioned MongoDB database variables)*
-5.  **Automatic Port Binding**:
-    *   The `Dockerfile` and `src/main.ts` are pre-configured to bind to port `0.0.0.0` and read the `PORT` environment variable automatically injected by Railway.
-6.  **Verify Webhook**:
-    *   Once deployed, Railway will provide a public production URL (e.g. `https://som-assistant-production.up.railway.app`).
-    *   Update your **LINE Webhook URL** to `https://<your-railway-url>/webhook` and verify it.
+# production mode
+$ pnpm run start:prod
+```
 
----
+## Run tests
 
-## 📄 License
-This project is [MIT licensed](LICENSE).
+```bash
+# unit tests
+$ pnpm run test
+
+# e2e tests
+$ pnpm run test:e2e
+
+# test coverage
+$ pnpm run test:cov
+```
+
+## Deployment
+
+When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+
+If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+
+```bash
+$ pnpm install -g @nestjs/mau
+$ mau deploy
+```
+
+With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+
+## Resources
+
+Check out a few resources that may come in handy when working with NestJS:
+
+- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
+- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
+- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
+- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
+- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
+- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
+- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
+- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+
+## Support
+
+Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+
+## Stay in touch
+
+- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
+- Website - [https://nestjs.com](https://nestjs.com/)
+- Twitter - [@nestframework](https://twitter.com/nestframework)
+
+## License
+
+Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
