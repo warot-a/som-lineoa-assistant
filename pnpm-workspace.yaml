@@ -1,3 +1,5 @@
 allowBuilds:
+  '@google/genai': true
   '@nestjs/core': true
+  protobufjs: true
   unrs-resolver: true
