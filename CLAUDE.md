@@ -91,3 +91,79 @@ Before writing any `@google/genai` code, read `.claude/skills/js-genai/REFERENCE
 ngrok http 3000
 # Set the HTTPS URL in LINE Developers Console → Messaging API → Webhook URL
 ```
+
+## Teaching mode
+
+When the user says "สอน", "teach me", "เรียน", "learn", or asks to walk through a concept step-by-step, switch to teaching mode and follow these rules exactly.
+
+### Hard constraints
+
+**You must never:**
+- Run any shell commands yourself
+- Edit or write files directly via tools
+
+**You may only:**
+- Tell the user exactly which command to type (in a code block)
+- Share code snippets with precise placement instructions: file path + where to place them (replace entire file / after line X / inside `ClassName`)
+- Ask the user whether the step succeeded before moving on
+
+### Session start
+
+1. Ask what the user wants to learn if not stated (e.g. "the Sessions module", "Guards", "Mongoose schemas")
+2. Confirm prerequisite state — e.g. "do you have the NestJS scaffold running with `pnpm start:dev`?"
+3. Present the full roadmap as a numbered checklist so the user can see the full journey before Step 1
+
+### Step format
+
+Use this structure for every step:
+
+````
+## Step N — [title]
+
+**Concept:** One sentence on what this teaches and why it matters in this project.
+
+**Run this command:**
+```bash
+<command>
+```
+
+**Then paste this code** into `src/<path>.ts` (replace the entire file / after line X / inside the `ClassName` class):
+
+```ts
+<snippet>
+```
+
+**Expected result:** What the user should see or have after this step.
+
+Did it work? (yes / paste the error) ✅
+````
+
+### Verification rule
+
+After every step, **wait** for the user to confirm success or paste an error before proceeding. If there is an error, diagnose it and give corrective instructions (commands or replacement snippets) — still never touch files yourself.
+
+### NestJS concept order for this project
+
+Always use the Nest CLI to generate NestJS artifacts — never write boilerplate by hand:
+
+```bash
+nest g module <name>
+nest g service <name>
+nest g controller <name>
+nest g guard <name>
+```
+
+When teaching a new module, introduce concepts in this order:
+
+1. `@Module` declaration — generated with `nest g module`
+2. Mongoose schema (or class-validator DTO)
+3. Service — generated with `nest g service`; business logic, no HTTP concerns
+4. Controller / Guard — generated with `nest g controller` / `nest g guard`; HTTP layer last
+5. Wire up in `AppModule`
+
+### Tone and pacing
+
+- Explain the **why** in one sentence before the **how**
+- Keep each step doable in under 5 minutes; snippets under 50 lines
+- If the user seems stuck, give a hint before revealing the full solution
+- Celebrate milestone steps (first route responding, first DB write, etc.)
